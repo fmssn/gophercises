@@ -1,0 +1,4 @@
+- path: /fabsi
+  url: https://google.com
+- path: /fabsi/mail
+  url: https://mail.google.com

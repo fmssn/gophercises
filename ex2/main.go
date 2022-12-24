@@ -1,13 +1,18 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/fmssn/gophercises/ex2/urlshort"
 )
 
 func main() {
+	filename := flag.String("file", "", "the yaml filename, str")
+	flag.Parse()
 	mux := defaultMux()
 
 	// Build the MapHandler using the mux as the fallback
@@ -28,6 +33,19 @@ func main() {
 	yamlHandler, err := urlshort.YAMLHandler([]byte(yaml), mapHandler)
 	if err != nil {
 		panic(err)
+	}
+
+	if *filename != "" {
+		data, err := os.ReadFile(*filename)
+		if err != nil {
+			log.Fatal("Couldn't open yaml file.", err)
+		}
+		fileYAMLHandler, err := urlshort.YAMLHandler(data, yamlHandler)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Starting the server on :8080")
+		http.ListenAndServe(":8080", fileYAMLHandler) //nasty nesting I know
 	}
 	fmt.Println("Starting the server on :8080")
 	http.ListenAndServe(":8080", yamlHandler)
